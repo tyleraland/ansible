@@ -1,0 +1,31 @@
+production:
+  adapter: postgresql
+  host: localhost
+  database: kandan_production
+  pool: 5
+  timeout: 5000
+  username: kandan
+  password: pass
+
+# Must have a non-production environment available or an error is produced
+# claiming no adapter is specified
+development:
+  adapter: postgresql
+  host: localhost
+  database: kandan_production
+  pool: 5
+  timeout: 5000
+  username: kandan
+  password: pass
+
+# development:
+#   adapter: sqlite3
+#   database: db/development.sqlite3
+#   pool: 5
+#   timeout: 5000
+
+# test:
+#   adapter: sqlite3
+#   database: db/test.sqlite3
+#   pool: 5
+#   timeout: 5000

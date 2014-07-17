@@ -1,0 +1,87 @@
+#!/usr/bin/env ansible-playbook --ask-sudo-pass -i hosts
+---
+- hosts: mmdev
+  sudo: yes
+  
+  tasks:
+
+  - name: upgrade and update system
+    apt: upgrade=full update_cache=yes
+
+  - name: install LAMP stack via apt
+    apt: pkg={{item}}
+    with_items:
+    - git
+    - apache2
+    - mysql-server-5.5
+    - mysql-client-5.5
+    - python-mysqldb # python bindings for ansible modules
+    - libapache2-mod-auth-mysql
+    - php5-mysql
+    - php5
+    - libapache2-mod-php5
+    - php5-mcrypt
+    - curl
+    - postgresql
+    - postgresql-contrib
+    - libxslt-dev
+    - libxml2-dev
+    - libpq-dev
+    - sqlite3
+    - libsqlite3-dev
+    - ruby1.9.1-dev
+    - nodejs
+    - gcc
+    - g++
+    - make
+    - python-psycopg2
+    - gawk
+    - libreadline6-dev
+    - libyaml-dev
+    - autoconf
+    - libgdbm-dev
+    - libncurses5-dev
+    - automake
+    - libtool
+    - bison
+    - pkg-config
+    - libffi-dev
+
+  - name: mysql_install_db
+    shell: mysql_install_db
+
+  - name: Ensure index.php is first in apaches dir.conf
+    copy: src=files/dir.conf dest=/etc/apache2/mods-enabled/dir.conf
+
+  - name: install ruby
+    sudo: no
+    script: install_ruby.sh
+
+  - name: get kandan
+    git: repo="https://github.com/kandanapp/kandan.git" dest=/opt/kandanapp
+
+  - name: let tal modify kandan folder
+    file: path=/opt/kandanapp owner=tal recurse=yes
+
+  # This must be in place BEFORE bundle exec rake db:create db:migrate kandan:bootstrap
+  - name: copy database config file
+    copy: src=files/database.yml dest=/opt/kandanapp/config/database.yml
+
+  - name: allow kandan to be served through Thin
+    lineinfile: dest=/opt/kandanapp/config/environments/production.rb
+                state=present
+                regexp="config\.serve_static_assets = false"
+                line="  config.serve_static_assets = true"
+
+  - name: create postgres database
+    sudo_user: postgres
+    postgresql_db: name=kandan_production
+
+  - name: create postgres user kandan
+    sudo_user: postgres
+    postgresql_user: db=kandan_production name=kandan password=pass priv=ALL
+
+  - name: install kandan dependencies
+    sudo: no
+    remote_user: tal
+    script: install_kandan.sh
