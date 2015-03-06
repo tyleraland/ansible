@@ -1,0 +1,68 @@
+#!/usr/bin/env ansible-playbook --ask-sudo-pass -i hosts
+---
+- hosts: plato
+  sudo: yes
+
+  tasks:
+
+  - name: upgrade and update system
+    apt: upgrade=full update_cache=yes
+
+  - name: system installs
+    apt: pkg={{item}}
+    with_items:
+    - git
+    - python-pip
+    - python-dev
+    - build-essential
+    - sqlite3
+
+  - name: upgrade pip
+    pip: name=pip state=latest
+
+  - name: pip installs
+    pip: name={{item}}
+    with_items:
+    - setuptools
+
+  - name: create user; do not set password
+    user: name=tal append=yes groups=ubuntu,adm,dialout,cdrom,floppy,sudo,audio,dip,video,plugdev,netdev shell=/bin/bash
+
+  - name: copy tal private key over
+    authorized_key: user=tal key="{{lookup('file', '/Users/tal/.keys/tal-plato.pub')}}"
+
+  - name: clone tal dotfiles
+    git: repo=https://github.com/tyleraland/dotfiles dest=/home/tal/dotfiles
+    sudo_user: tal
+
+  - name: install dotfiles
+    command: /home/tal/dotfiles/install.sh
+    sudo_user: tal
+
+  - name: clone etcetera
+    git: repo=https://github.com/tyleraland/etcetera.git dest=/home/tal/etcetera
+    sudo_user: tal
+
+  - name: install etcetera to a virtualenv
+    command: bin/bootstrap.sh chdir=/home/tal/etcetera
+    sudo_user: tal
+
+  - name: install etcetera api keys
+    copy: src=etcetera-secrets/ dest=/home/tal/etcetera/.secrets
+
+  - cron: name="gps etcetera" minute=0 hour=12 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --gps"
+    sudo_user: tal
+  - cron: name="sms etcetera" minute=1 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --sms"
+    sudo_user: tal
+  - cron: name="twitter etcetera" minute=2 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --twitter"
+    sudo_user: tal
+  - cron: name="fitbit etcetera" minute=3 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --fitbit"
+    sudo_user: tal
+  - cron: name="rescuetime etcetera" minute=4 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --rescuetime"
+    sudo_user: tal
+  - cron: name="calls etcetera" minute=5 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --calls"
+    sudo_user: tal
+  - cron: name="last_fm etcetera" minute=6 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --last_fm"
+    sudo_user: tal
+
+# TODO: install ssh keys
