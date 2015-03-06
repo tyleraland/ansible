@@ -50,7 +50,7 @@
   - name: install etcetera api keys
     copy: src=etcetera-secrets/ dest=/home/tal/etcetera/.secrets
 
-  - cron: name="gps etcetera" minute=0 hour=12 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --gps"
+  - cron: name="gps etcetera" minute=0 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --gps"
     sudo_user: tal
   - cron: name="sms etcetera" minute=1 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --sms"
     sudo_user: tal
