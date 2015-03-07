@@ -50,19 +50,20 @@
   - name: install etcetera api keys
     copy: src=etcetera-secrets/ dest=/home/tal/etcetera/.secrets
 
-  - cron: name="gps etcetera" minute=0 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --gps"
+  # NOTE: Times are all UTC
+  - cron: name="gps etcetera" minute=0 hour=0 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --gps"
     sudo_user: tal
-  - cron: name="sms etcetera" minute=1 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --sms"
+  - cron: name="sms etcetera" minute=1 hour=0 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --sms"
     sudo_user: tal
-  - cron: name="twitter etcetera" minute=2 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --twitter"
+  - cron: name="twitter etcetera" minute=1 hour=0 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --twitter"
     sudo_user: tal
-  - cron: name="fitbit etcetera" minute=3 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --fitbit"
+  - cron: name="fitbit etcetera" minute=1 hour=0 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --fitbit"
     sudo_user: tal
-  - cron: name="rescuetime etcetera" minute=4 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --rescuetime"
+  - cron: name="rescuetime etcetera" minute=1 hour=0 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --rescuetime"
     sudo_user: tal
-  - cron: name="calls etcetera" minute=5 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --calls"
+  - cron: name="calls etcetera" minute=1 hour=0 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --calls"
     sudo_user: tal
-  - cron: name="last_fm etcetera" minute=6 hour=0,4,8,12,16,20 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --last_fm"
+  - cron: name="last_fm etcetera" minute=1 hour=0 job="etcetera/bin/env-run etcetera/etcetera-env etcetera/etcetera --last_fm"
     sudo_user: tal
 
 # TODO: install ssh keys
